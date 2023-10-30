@@ -120,6 +120,16 @@
 		font-family: monospace;
 	}
 
+	.stave {
+		background: white;
+		text-align: center;
+		width: 800px;
+		margin: 10px auto 20px;
+		padding: 10px 20px;
+		font-size: 24px;
+		font-family: monospace;
+	}
+
 	#trace {
 		background: #0004;
 		color: #fffa;
@@ -163,19 +173,85 @@
 
 	<div id=graph>
 		<span></span>
-		<canvas width="800" height="128"></canvas>
+		<canvas width="500" height="128"></canvas>
 	</div>
 
 	<div id=result>Click Go and play a note</div>
 
+	<div id="staveTreble" class="stave"></div>
+	<div id="staveBass" class="stave"></div>
+
+
 	<div id=trace></div>
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 	<script type="text/javascript" src="note-detector.js"></script>
 	<script type="text/javascript" src="note-utils.js"></script>
 	<script type="text/javascript">
 		
 		'use strict';
+
+		// =========================
+
+		const { Renderer, Stave, StaveNote, Voice, Formatter } = Vex.Flow;
+
+		function drawStave(type) {
+			// Create an SVG renderer and attach it to the DIV element named "boo".
+			const div = document.getElementById(type === 'treble' ? "staveTreble" : 'staveBass');
+			const renderer = new Renderer(div, Renderer.Backends.SVG);
+
+			// Configure the rendering context.
+			renderer.resize(400, 200);
+			const staveContext = renderer.getContext();
+
+			// Create a stave of width 400 at position 10, 40 on the canvas.
+			const stave = new Stave(10, 40, 400);
+
+			// Add a clef and time signature.
+			stave.addClef(type).addTimeSignature("4/4");
+
+			// Connect it to the rendering context and draw!
+			stave.setContext(staveContext).draw();
+
+			return { staveContext, stave };
+		}
+
+		// =========================
+
+		function drawNote(type, note, staveContext, stave) {
+			// Create the notes
+			const notes = [
+				// A quarter-note C.
+				new StaveNote({ keys: [note], duration: "w", clef: type }),
+			];
+
+			// Create a voice in 4/4 and add above notes
+			const voice = new Voice({ num_beats: 4, beat_value: 4 });
+			voice.addTickables(notes);
+
+			// Format and justify the notes to 400 pixels.
+			new Formatter().joinVoices([voice]).format([voice], 350);
+
+			// Render voice
+			voice.draw(staveContext, stave);
+		}
+
+		// =========================
+
+		function showNewNote(note) {
+			document.getElementById('staveTreble').innerHTML = '';
+			document.getElementById('staveBass').innerHTML = '';
+
+			const { staveContext: staveContextTreble, stave: staveTreble } = drawStave('treble');
+			const { staveContext: staveContextBass, stave: staveBass } = drawStave('bass');
+
+			drawNote('treble', note, staveContextTreble, staveTreble);
+			drawNote('bass', note, staveContextBass, staveBass);
+		}
+
+
+		// =========================
 
 		var conf =
 		{
@@ -258,6 +334,8 @@
 			desc = (note && note.stable) ? hzToNoteString(note.freq) : '';
 
 			$('#result').html(desc);
+
+			showNewNote(desc?.toLowerCase().replace('.', '/').replace('#', '#/'));
 		}
 
 		//
