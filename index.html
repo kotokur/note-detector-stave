@@ -336,7 +336,11 @@
 			$('#result').html(desc);
 
 			if (desc) {
-				showNewNote(desc?.toLowerCase().replace('.', '/').replace('#', '#/'));
+				try {
+					showNewNote(desc?.toLowerCase().replace('.', '/').replace('#', '#/'));
+				} catch (e) {
+					console.log('Can\'t decode note: ' + desc);
+				}
 			}
 		}
 
