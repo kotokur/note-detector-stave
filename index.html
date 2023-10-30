@@ -335,7 +335,9 @@
 
 			$('#result').html(desc);
 
-			showNewNote(desc?.toLowerCase().replace('.', '/').replace('#', '#/'));
+			if (desc) {
+				showNewNote(desc?.toLowerCase().replace('.', '/').replace('#', '#/'));
+			}
 		}
 
 		//
