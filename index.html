@@ -150,7 +150,7 @@
 </style>
 </head>
 <body>
-Version 0.1
+Version 0.2
 	<div id=go>Go</div>
 
 	<div id=show-options><a href=#>Options</a></div>
@@ -341,7 +341,7 @@ Version 0.1
 					const noteWithoutDot = desc.replace('.', '');
 					const note = noteWithoutDot.slice(0, -1);
 					const octave = noteWithoutDot[noteWithoutDot.length - 1];
-					const fixedOctave = !["A", "A#", "B"].includes(note) ? octave + 1 : octave;
+					const fixedOctave = !["A", "A#", "B"].includes(note) ? +octave + 1 : octave;
 					showNewNote(note + '/' + fixedOctave);
 				} catch (e) {
 					console.log('Can\'t decode note: ' + desc);
