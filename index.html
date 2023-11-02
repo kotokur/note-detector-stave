@@ -340,7 +340,7 @@
 					const noteWithoutDot = desc.replace('.', '');
 					const note = noteWithoutDot.slice(0, -1);
 					const octave = noteWithoutDot[noteWithoutDot.length - 1];
-					const fixedOctave = ["A", "A#", "B"].includes(note) ? octave : octave - 1;
+					const fixedOctave = !["A", "A#", "B"].includes(note) ? octave + 1 : octave;
 					showNewNote(note + '/' + fixedOctave);
 				} catch (e) {
 					console.log('Can\'t decode note: ' + desc);
